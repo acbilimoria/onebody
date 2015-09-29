@@ -243,4 +243,15 @@ describe Group do
       end
     end
   end
+
+  describe 'leader relationship' do
+    before do
+      @group_leader = FactoryGirl.create(:group_leader, id: 1, person_id: 1, group_id: 1)
+      @group = FactoryGirl.create(:group, id: 1, name: 'Tester Group', category: 'church')
+    end
+
+    it 'should load the group_leader entry' do
+      expect(@group.leaders).to match([@group_leader])
+    end
+  end
 end
