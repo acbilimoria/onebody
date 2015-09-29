@@ -34,6 +34,16 @@ class GroupsController < ApplicationController
     @group = Group.new(group_params)
     @group.creator = @logged_in
     if @group.save
+      params[:group][:leaders].each do |leader_id|
+        group_leader = GroupLeader.where("person_id = ? AND group_id = ?", leader_id, @group.id)[0]
+        #TODO enable removing of group_leaders
+        if !group_leader
+          group_leader = GroupLeader.new
+          group_leader.person_id = leader_id
+          group_leader.group_id = @group.id
+          group_leader.save
+        end
+      end
       if @logged_in.admin?(:manage_groups)
         @group.update_attribute(:approved, true)
         flash[:notice] = t('groups.created')
@@ -63,6 +73,14 @@ class GroupsController < ApplicationController
     if @logged_in.can_update?(@group)
       params[:group][:photo] = nil if params[:group][:photo] == 'remove'
       if @group.update_attributes(group_params)
+        params[:group][:leaders].each do |leader_id|
+          group_leader = GroupLeader.where("person_id = ? AND group_id = ?", leader_id, @group.id)[0]
+          #TODO enable removing of group_leaders
+          group_leader = GroupLeader.new
+          group_leader.person_id = leader_id
+          group_leader.group_id = @group.id
+          group_leader.save
+        end
         flash[:notice] = t('groups.saved')
         redirect_to @group
       else
@@ -155,7 +173,7 @@ class GroupsController < ApplicationController
   end
 
   def group_attributes
-    base = [:name, :description, :photo, :meets, :location, :directions, :other_notes, :address, :members_send, :private, :category, :leader_id, :blog, :email, :prayer, :attendance, :gcal_private_link, :approval_required_to_join, :pictures, :cm_api_list_id, :has_tasks]
+    base = [:name, :description, :photo, :meets, :location, :directions, :other_notes, :address, :members_send, :private, :category, :blog, :email, :prayer, :attendance, :gcal_private_link, :approval_required_to_join, :pictures, :cm_api_list_id, :has_tasks]
     base += [:approved, :membership_mode, :link_code, :parents_of, :hidden] if @logged_in.admin?(:manage_groups)
     base
   end

@@ -26,6 +26,9 @@
               = t('groups.hidden.label')
         %td
           = link_to(group.leader.try(:name), group.leader) if group.leader
+          - if group.leaders.present?
+            - group.leaders.each do |leaders|
+              = link_to(leaders.person.try(:name), leaders.person) if (leaders.person && leaders.person != group.leader)
         %td
           = group.memberships.count
       - if group.description.present?

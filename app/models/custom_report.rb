@@ -164,7 +164,7 @@ class CustomReport < ActiveRecord::Base
      :directions,
      :other_notes,
      :category,
-     :leader_id,
+     #:leader_id,
      :full_address]
   end
 
