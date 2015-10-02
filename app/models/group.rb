@@ -19,11 +19,12 @@ class Group < ActiveRecord::Base
   has_many :tasks, -> { order(:position) }
   has_many :document_folder_groups, dependent: :destroy
   has_many :document_folders, through: :document_folder_groups
-  has_many :leaders, class_name: 'GroupLeader', foreign_key: 'group_id'
+  has_many :group_leaders, class_name: 'GroupLeader'
+  has_many :leaders, -> { order(:last_name, :first_name) }, through: :group_leaders, source: :person, foreign_key: 'leader_id'
   belongs_to :creator, class_name: 'Person', foreign_key: 'creator_id'
-  belongs_to :leader, class_name: 'Person', foreign_key: 'leader_id'
   belongs_to :parents_of_group, class_name: 'Group', foreign_key: 'parents_of'
   belongs_to :site
+  accepts_nested_attributes_for :group_leaders
 
   scope :active,     -> { where(hidden: false) }
   scope :hidden,     -> { where(hidden: true) }
