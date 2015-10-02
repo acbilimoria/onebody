@@ -7,15 +7,14 @@
     %tr
       %td= t('groups.show.details.created_by')
       %td= link_to(@group.creator.name, @group.creator)
-  - if @group.leader || @group.leaders
+  - if @group.leaders[0]
     %tr
       %td
-        = t('groups.show.details.leader')
+        = t('groups.show.details.leader').pluralize
       %td
-        = link_to(@group.leader.name, @group.leader) if @group.leader
-          - @group.leaders.each do |leaders|
-          = link_to(leaders.person.try(:name), leaders.person) if (leaders.person && leaders.person != @group.leader)
-  - if @group.admins.any? and @group.admins.to_a != [@group.leader] and @group.admins.to_a != @group.leaders
+        - @group.leaders.each do |leader|
+          = link_to(leader.try(:name), leader)
+  - if @group.admins.any? and @group.admins.to_a != @group.leaders
     %tr
       %td= t('groups.show.details.admins')
       %td= @group.admins.map { |p| link_to(p.try(:name), p) }.join(', ').html_safe

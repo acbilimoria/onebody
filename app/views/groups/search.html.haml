@@ -7,7 +7,7 @@
     %tr
       %th
       %th= t('groups.table.group_name')
-      %th= t('groups.table.leader')
+      %th= t('groups.table.leader').pluralize
       %th= t('groups.table.member_count')
 
     - @groups.each do |group|
@@ -25,10 +25,8 @@
               = icon 'fa fa-eye-slash'
               = t('groups.hidden.label')
         %td
-          = link_to(group.leader.try(:name), group.leader) if group.leader
-          - if group.leaders.present?
-            - group.leaders.each do |leaders|
-              = link_to(leaders.person.try(:name), leaders.person) if (leaders.person && leaders.person != group.leader)
+          - group.leaders.each do |leader|
+            = link_to(leader.try(:name), leader)
         %td
           = group.memberships.count
       - if group.description.present?

@@ -22,7 +22,7 @@
   = form.text_area :other_notes, rows: 3, class: 'form-control'
 .form-group
   = form.label :leaders
-  = form.select :leaders, @group.people.map { |m| [m.name, m.id] }, { include_blank: false }, class: 'form-control', multiple: 'multiple'
+  = form.select :leaders, @group.people.map { |m| [m.name, m.id] }, { include_blank: false }, class: 'form-control', multiple: 'multiple', name: 'group[group_leaders][person_id]'
 .form-group
   = form.label :creator
   = form.text_field :creator, value: (@group.creator ? @group.creator.name : nil), readonly: true, name: 'creator_name', class: 'form-control'
