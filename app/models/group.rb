@@ -24,7 +24,7 @@ class Group < ActiveRecord::Base
   belongs_to :creator, class_name: 'Person', foreign_key: 'creator_id'
   belongs_to :parents_of_group, class_name: 'Group', foreign_key: 'parents_of'
   belongs_to :site
-  accepts_nested_attributes_for :group_leaders
+  accepts_nested_attributes_for :group_leaders, reject_if: proc { |attributes| attributes['person_id'].blank? }
 
   scope :active,     -> { where(hidden: false) }
   scope :hidden,     -> { where(hidden: true) }

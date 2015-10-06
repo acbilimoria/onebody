@@ -27,6 +27,7 @@ class GroupsController < ApplicationController
 
   def new
     @group = Group.new(creator_id: @logged_in.id)
+    @group.group_leaders.build
     @categories = Group.categories.keys
   end
 
@@ -34,16 +35,6 @@ class GroupsController < ApplicationController
     @group = Group.new(group_params)
     @group.creator = @logged_in
     if @group.save
-      params[:group][:leaders].each do |leader_id|
-        group_leader = GroupLeader.where("person_id = ? AND group_id = ?", leader_id, @group.id)[0]
-        #TODO enable removing of group_leaders
-        if !group_leader
-          group_leader = GroupLeader.new
-          group_leader.person_id = leader_id
-          group_leader.group_id = @group.id
-          group_leader.save
-        end
-      end
       if @logged_in.admin?(:manage_groups)
         @group.update_attribute(:approved, true)
         flash[:notice] = t('groups.created')
@@ -60,6 +51,7 @@ class GroupsController < ApplicationController
 
   def edit
     @group ||= Group.find(params[:id])
+    @group.group_leaders.build
     if @logged_in.can_update?(@group)
       @categories = Group.categories.keys
       @members = @group.people.minimal.order('last_name, first_name')
@@ -73,14 +65,6 @@ class GroupsController < ApplicationController
     if @logged_in.can_update?(@group)
       params[:group][:photo] = nil if params[:group][:photo] == 'remove'
       if @group.update_attributes(group_params)
-        params[:group][:leaders].each do |leader_id|
-          group_leader = GroupLeader.where("person_id = ? AND group_id = ?", leader_id, @group.id)[0]
-          #TODO enable removing of group_leaders
-          group_leader = GroupLeader.new
-          group_leader.person_id = leader_id
-          group_leader.group_id = @group.id
-          group_leader.save
-        end
         flash[:notice] = t('groups.saved')
         redirect_to @group
       else
@@ -179,7 +163,7 @@ class GroupsController < ApplicationController
   end
 
   def group_params
-    params.require(:group).permit(*group_attributes)
+    params.require(:group).permit(*group_attributes, group_leaders_attributes: [ :id, :person_id, :group_id, :_destroy ])
   end
 
   def feature_enabled?
