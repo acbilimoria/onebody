@@ -71,7 +71,7 @@ class Group < ActiveRecord::Base
 
   def skip_group_leaders(attributes)
     group_leader = GroupLeader.find_by_group_id_and_person_id(attributes['group_id'], attributes['person_id'])
-    return true unless !attributes['person_id'].blank? && !attributes['group_id'].blank? && group_leader.blank?
+    return true if attributes['person_id'].blank? || attributes['group_id'].blank? || !group_leader.blank?
   end
 
   def attendance_required?
