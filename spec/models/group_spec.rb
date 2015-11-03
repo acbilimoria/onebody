@@ -251,7 +251,52 @@ describe Group do
     end
 
     it 'should load the group_leader entry' do
-      expect(@group.leaders).to match([@group_leader])
+      expect(@group.group_leaders).to match([@group_leader])
+    end
+  end
+
+  describe '#skip_group_leaders' do
+    context 'given no group id or person id' do
+      it 'should return true' do
+        @group_leaders_group = nil
+        attributes = {'group_id'=>'', 'person_id'=>''}
+        result = @group.skip_group_leaders(attributes)
+        expect(result).to eq(true)
+      end
+    end
+
+    context 'given person id but no group id' do
+      it 'should return true' do
+        @group_leaders_group = nil
+        attributes = {'group_id'=>'', 'person_id'=>@person.id}
+        result = @group.skip_group_leaders(attributes)
+        expect(result).to eq(true)
+      end
+    end
+
+    context 'given group id but no person id' do
+      it 'should return true' do
+        attributes = {'group_id'=>@group.id, 'person_id'=>''}
+        result = @group.skip_group_leaders(attributes)
+        expect(result).to eq(true)
+      end
+    end
+
+    context 'given group id and person_id' do
+      it 'should return false' do
+        attributes = {'group_id'=>@group.id, 'person_id'=>@person.id}
+        result = @group.skip_group_leaders(attributes)
+        expect(result).to eq(false)
+      end
+    end
+
+    context 'given a cached group id and person_id' do
+      it 'should return false' do
+        @group_leaders_group = Group.find(@group.id)
+        attributes = {'group_id'=>'', 'person_id'=>@person.id}
+        result = @group.skip_group_leaders(attributes)
+        expect(result).to eq(false)
+      end
     end
   end
 end

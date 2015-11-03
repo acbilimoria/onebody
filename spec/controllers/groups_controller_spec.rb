@@ -301,7 +301,8 @@ describe GroupsController, type: :controller do
           id: @group.id,
           group: {
             name: 'test name',
-            category: 'test cat'
+            category: 'test cat',
+            group_leaders_attributes: [{person_id: ''}, {person_id: @person.id, group_id: @group.id}],
           }
         }, { logged_in_id: @person.id }
       end
@@ -311,6 +312,10 @@ describe GroupsController, type: :controller do
           'name'     => 'test name',
           'category' => 'test cat'
         )
+      end
+
+      it 'creates a group leader' do
+        expect(@group.leaders.last.name).to eq(@person.name)
       end
 
       it 'redirect to the group page' do
@@ -449,6 +454,10 @@ describe GroupsController, type: :controller do
 
     it 'renders the new group form' do
       expect(response).to render_template(:new)
+    end
+
+    it 'creates a new group object' do
+      expect(@group).to be_kind_of(Group)
     end
   end
 
