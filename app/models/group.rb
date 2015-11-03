@@ -70,8 +70,13 @@ class Group < ActiveRecord::Base
   blank_to_nil :address
 
   def skip_group_leaders(attributes)
-    group_leader = GroupLeader.find_by_group_id_and_person_id(attributes['group_id'], attributes['person_id'])
-    return true if attributes['person_id'].blank? || attributes['group_id'].blank? || !group_leader.blank?
+    if attributes['group_id'].present?
+      @group_leaders_group = Group.find(attributes['group_id'])
+    end
+    if @group_leaders_group.present?
+      group_leader = GroupLeader.find_by_group_id_and_person_id(@group_leaders_group.id, attributes['person_id'])
+    end
+    return true if attributes['person_id'].empty? || !group_leader.blank?
   end
 
   def attendance_required?
